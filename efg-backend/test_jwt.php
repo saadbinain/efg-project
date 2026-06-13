@@ -1,0 +1,12 @@
+<?php
+require_once 'config/auth.php';
+
+// Paste your access token between the quotes
+$token = 'eyJhbGciOiJFUzI1NiIsImtpZCI6Ijk5N2FiZDFkLTU5NmItNDBkZS04YjI1LTlmN2MxYzA5ZWExYiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3J4dWZ5b3B5enZoZ2d0dGxjZnZvLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkNmY2YTJjZi03OWI2LTQ3NDQtYTEyZi0xMWViNTk1MjY3Y2MiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzgxMjk3NzQ0LCJpYXQiOjE3ODEyOTQxNDQsImVtYWlsIjoic2FhZG1hbHVwZXRAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODEyOTQxNDR9XSwic2Vzc2lvbl9pZCI6ImU5MWUwNmIzLTM1M2UtNDg5ZS05YTExLTU2OGMyMzQzZDJlNiIsImlzX2Fub255bW91cyI6ZmFsc2V9.bwNasXWUfHnSTdhT7lsECRgOE8RtWo5CeJENwvE24pBNB0WZ-DzPgVle9b6FmtTy5Urs52lV4-pbC2vdWFDFGg';
+
+$result = validateJWT($token);
+if ($result) {
+    echo "VALID. User: " . json_encode($result);
+} else {
+    echo "INVALID";
+}
