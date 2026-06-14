@@ -36,6 +36,10 @@ switch ($resource) {
         require_once 'college_courses.php';
         handleCollegeCourses($db);
         break;
+    case 'stats':
+        require_once 'stats.php';
+        handleStats($db, $id);
+        break;
     default:
         http_response_code(404);
         echo json_encode(["error" => "Endpoint not found"]);

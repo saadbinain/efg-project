@@ -23,7 +23,7 @@ function handleAdminColleges($db, $collegeId) {
             $college['highlight_pictures_urls'] = json_decode($college['highlight_pictures_urls']);
             echo json_encode($college);
         } else {
-            $stmt = $db->query("SELECT id, name, logo_url FROM colleges ORDER BY name");
+            $stmt = $db->query("SELECT id, name, logo_url, abbreviation FROM colleges ORDER BY name");
             echo json_encode($stmt->fetchAll());
         }
         return;
@@ -32,16 +32,17 @@ function handleAdminColleges($db, $collegeId) {
     // Create new college
     if ($method === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
-        $stmt = $db->prepare("INSERT INTO colleges (name, description, branches, locations, contacts, social_media, logo_url, highlight_pictures_urls) VALUES (:name, :desc, :branches, :locs, :contacts, :social, :logo, :pics)");
+        $stmt = $db->prepare("INSERT INTO colleges (name, abbreviation, description, branches, locations, contacts, social_media, logo_url, highlight_pictures_urls) VALUES (:name, :abbr, :desc, :branches, :locs, :contacts, :social, :logo, :pics)");
         $stmt->execute([
-            'name'     => $input['name'],
-            'desc'     => $input['description'] ?? '',
-            'branches' => json_encode($input['branches'] ?? []),
-            'locs'     => json_encode($input['locations'] ?? []),
-            'contacts' => json_encode($input['contacts'] ?? new stdClass()),
-            'social'   => json_encode($input['social_media'] ?? new stdClass()),
-            'logo'     => $input['logo_url'] ?? '',
-            'pics'     => json_encode($input['highlight_pictures_urls'] ?? [])
+            'name'         => $input['name'],
+            'abbr'         => $input['abbreviation'] ?? '',
+            'desc'         => $input['description'] ?? '',
+            'branches'     => json_encode($input['branches'] ?? []),
+            'locs'         => json_encode($input['locations'] ?? []),
+            'contacts'     => json_encode($input['contacts'] ?? new stdClass()),
+            'social'       => json_encode($input['social_media'] ?? new stdClass()),
+            'logo'         => $input['logo_url'] ?? '',
+            'pics'         => json_encode($input['highlight_pictures_urls'] ?? [])
         ]);
         echo json_encode(['id' => $db->lastInsertId(), 'success' => true]);
         return;
@@ -50,17 +51,18 @@ function handleAdminColleges($db, $collegeId) {
     // Update college
     if ($method === 'PUT' && $collegeId) {
         $input = json_decode(file_get_contents('php://input'), true);
-        $stmt = $db->prepare("UPDATE colleges SET name=:name, description=:desc, branches=:branches, locations=:locs, contacts=:contacts, social_media=:social, logo_url=:logo, highlight_pictures_urls=:pics WHERE id=:id");
+        $stmt = $db->prepare("UPDATE colleges SET name=:name, abbreviation=:abbr, description=:desc, branches=:branches, locations=:locs, contacts=:contacts, social_media=:social, logo_url=:logo, highlight_pictures_urls=:pics WHERE id=:id");
         $stmt->execute([
-            'id'       => $collegeId,
-            'name'     => $input['name'],
-            'desc'     => $input['description'],
-            'branches' => json_encode($input['branches']),
-            'locs'     => json_encode($input['locations']),
-            'contacts' => json_encode($input['contacts']),
-            'social'   => json_encode($input['social_media']),
-            'logo'     => $input['logo_url'],
-            'pics'     => json_encode($input['highlight_pictures_urls'])
+            'id'           => $collegeId,
+            'name'         => $input['name'],
+            'abbr'         => $input['abbreviation'] ?? '',
+            'desc'         => $input['description'],
+            'branches'     => json_encode($input['branches']),
+            'locs'         => json_encode($input['locations']),
+            'contacts'     => json_encode($input['contacts']),
+            'social'       => json_encode($input['social_media']),
+            'logo'         => $input['logo_url'],
+            'pics'         => json_encode($input['highlight_pictures_urls'])
         ]);
         echo json_encode(['success' => true]);
         return;

@@ -71,11 +71,28 @@ switch ($resource) {
 
     case 'colleges':
         if ($id && $subResource === 'courses') {
-            require_once 'admin_college_courses.php';
-            handleAdminCollegeCourses($db, $id, $subId);
+            $action = $segments[4] ?? null;
+            if ($action === 'expenses') {
+                $expenseId = $segments[5] ?? null;
+                require_once 'admin_college_course_expenses.php';
+                handleAdminCollegeCourseExpenses($db, $id, $subId, $expenseId);
+            } else {
+                require_once 'admin_college_courses.php';
+                handleAdminCollegeCourses($db, $id, $subId);
+            }
         } else {
             require_once 'admin_colleges.php';
             handleAdminColleges($db, $id);
+        }
+        break;
+
+    case 'upload':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once 'admin_upload.php';
+            handleAdminUpload();
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
         }
         break;
 

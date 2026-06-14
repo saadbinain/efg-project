@@ -1,32 +1,156 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { fetchColleges } from '../services/api'
 
-const dummyColleges = [
-  { id: 101, name: 'Tech University', logo_url: '', locations: ['Manila', 'Cebu'] },
-  { id: 102, name: 'Metro College', logo_url: '', locations: ['Quezon City'] },
-]
+const INITIAL_VISIBLE = 6
 
 export default function CollegeList() {
+  const [colleges, setColleges] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    fetchColleges()
+      .then(data => {
+        setColleges(data)
+        setLoading(false)
+      })
+      .catch(() => {
+        setError('Failed to load colleges. Make sure the backend server is running.')
+        setLoading(false)
+      })
+  }, [])
+
+  const filteredColleges = colleges.filter(col => {
+    const nameMatch = col.name.toLowerCase().includes(search.toLowerCase())
+    const locationMatch = Array.isArray(col.locations)
+      ? col.locations.some(loc => loc.toLowerCase().includes(search.toLowerCase()))
+      : typeof col.locations === 'string'
+        ? col.locations.toLowerCase().includes(search.toLowerCase())
+        : false
+    return nameMatch || locationMatch
+  })
+
+  const visibleColleges = filteredColleges.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredColleges.length
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-primary mb-6">Colleges</h1>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {dummyColleges.map(col => (
-          <Link
-            key={col.id}
-            to={`/colleges/${col.id}`}
-            className="block p-5 bg-white rounded-xl shadow-sm border hover:shadow-md hover:border-accent transition-all no-underline"
-          >
-            <div className="flex items-center space-x-3 mb-2">
-              {col.logo_url ? (
-                <img src={col.logo_url} alt="" className="w-12 h-12 object-contain rounded" />
-              ) : (
-                <div className="w-12 h-12 bg-bgLight rounded flex items-center justify-center text-gray-400">Logo</div>
-              )}
-              <h2 className="text-xl font-semibold text-primary">{col.name}</h2>
+    <div className="cd-page">
+      <section className="cd-hero">
+        <div className="cd-hero-particles">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="efg-particle" style={{ '--delay': `${i * 1.2}s`, '--x': `${10 + i * 22}%` }} />
+          ))}
+        </div>
+        <div className="cd-hero-inner" style={{ padding: '3.5rem 2rem' }}>
+          <h1 className="cd-hero-title">Partner Schools</h1>
+          <p className="cd-hero-overview" style={{ marginBottom: 0 }}>
+            Browse through accredited colleges and universities in the province to find information about campuses, locations, and course offerings.
+          </p>
+          <div className="hero-search-wrap">
+            <input
+              type="text"
+              placeholder="Search schools by name or location..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setVisibleCount(INITIAL_VISIBLE)
+              }}
+            />
+            <button type="button" style={{ pointerEvents: 'none' }}>🔍 Find</button>
+          </div>
+        </div>
+      </section>
+
+      <div className="cd-body">
+        {error && (
+          <div style={{
+            background: '#fef2f2', border: '1px solid #fca5a5',
+            color: '#dc2626', borderRadius: 10, padding: '0.75rem 1rem',
+            marginBottom: '1.5rem', fontSize: '0.88rem',
+          }}>
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} style={{
+                height: 110, borderRadius: 14,
+                background: '#f3f4f6', animation: 'efg-pulse 1.5s ease-in-out infinite',
+                animationDelay: `${i * 0.1}s`,
+              }} />
+            ))}
+          </div>
+        ) : filteredColleges.length === 0 ? (
+          <div className="cd-empty-state">
+            <span className="cd-empty-icon">🏫</span>
+            <p>No schools found matching "{search}". Try another search term.</p>
+          </div>
+        ) : (
+          <>
+            {/* Result count */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                Showing <strong>{Math.min(visibleCount, filteredColleges.length)}</strong> of <strong>{filteredColleges.length}</strong> schools
+              </p>
             </div>
-            <p className="text-sm text-gray-500">{col.locations.join(', ')}</p>
-          </Link>
-        ))}
+
+            <div className="cd-colleges-grid">
+              {visibleColleges.map(col => (
+                <Link
+                  key={col.id}
+                  to={`/colleges/${col.id}`}
+                  className="cd-college-card"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div className="cd-college-card-accent" />
+                  <div className="cd-college-logo">
+                    {col.logo_url ? (
+                      <img src={col.logo_url} alt={col.name} />
+                    ) : (
+                      <span className="cd-college-logo-fallback">🏫</span>
+                    )}
+                  </div>
+                  <div className="cd-college-info">
+                    <h2 className="cd-college-name">{col.name}</h2>
+                    {col.locations && col.locations.length > 0 && (
+                      <p style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.2rem' }}>
+                        <span>📍</span> {Array.isArray(col.locations) ? col.locations.join(', ') : col.locations}
+                      </p>
+                    )}
+                  </div>
+                  <div className="cd-college-arrow">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* View More / Show Less */}
+            <div className="view-more-wrap">
+              {hasMore ? (
+                <button
+                  className="btn-view-more"
+                  onClick={() => setVisibleCount(v => v + 6)}
+                >
+                  View More Schools ↓
+                </button>
+              ) : filteredColleges.length > INITIAL_VISIBLE ? (
+                <button
+                  className="btn-view-more"
+                  style={{ background: '#64748b', boxShadow: 'none' }}
+                  onClick={() => setVisibleCount(INITIAL_VISIBLE)}
+                >
+                  Show Less ↑
+                </button>
+              ) : null}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

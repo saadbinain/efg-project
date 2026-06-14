@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
+import Home from './pages/Home'
 import CourseSearch from './pages/CourseSearch'
 import CourseDetails from './pages/CourseDetails'
 import CollegeList from './pages/CollegeList'
@@ -19,7 +20,7 @@ function App() {
       <Routes>
         {/* Public routes with main Layout */}
         <Route element={<Layout />}>
-          <Route path="/" element={<CourseSearch />} />
+          <Route path="/" element={<Home />} />
           <Route path="/courses" element={<CourseSearch />} />
           <Route path="/courses/:id" element={<CourseDetails />} />
           <Route path="/colleges" element={<CollegeList />} />

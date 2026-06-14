@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = '/api';  // Proxied by Vite → no CORS preflight overhead
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -22,7 +22,8 @@ export const fetchCourses = (search = '') => {
   return request(`/courses${query}`);
 };
 
-export const fetchCourseById = (id) => request(`/courses/${id}`);
+export const fetchCourseById = (id, collegeId) =>
+  request(`/courses/${id}${collegeId ? `?college_id=${collegeId}` : ''}`);
 
 export const fetchColleges = () => request('/colleges');
 
@@ -30,3 +31,7 @@ export const fetchCollegeById = (id) => request(`/colleges/${id}`);
 
 export const fetchSpecificPricing = (collegeId, courseId) =>
   request(`/college-courses?college_id=${collegeId}&course_id=${courseId}`);
+
+export const fetchStats = () => request('/stats');
+
+export const incrementStats = () => request('/stats/increment', { method: 'POST' });

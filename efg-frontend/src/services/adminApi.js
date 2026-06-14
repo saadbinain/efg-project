@@ -1,16 +1,22 @@
 import { supabase } from '../supabaseClient'
 
-const API_BASE = 'http://localhost:8000/api/admin'   // New admin endpoints
+const API_BASE = '/api/admin'  // Proxied by Vite → no CORS preflight overhead
 
 async function authFetch(endpoint, options = {}) {
   const { data: { session } } = await supabase.auth.getSession()
   const token = session?.access_token
+  
+  const headers = {
+    ...(token && { Authorization: `Bearer ${token}` }),
+    ...options.headers,
+  }
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json'
+  }
+
   const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     ...options,
+    headers,
   })
   if (!res.ok) {
     const error = await res.json().catch(() => ({}))
@@ -30,12 +36,19 @@ export const updateCollege = (id, college) => authFetch(`/colleges/${id}`, { met
 export const deleteCollege = (id) => authFetch(`/colleges/${id}`, { method: 'DELETE' })
 
 export const fetchCollegeCourses = (collegeId) => authFetch(`/colleges/${collegeId}/courses`)
-export const updateCollegeCoursePricing = (collegeId, courseId, pricing) =>
-  authFetch(`/colleges/${collegeId}/courses/${courseId}`, { method: 'PUT', body: JSON.stringify(pricing) })
-export const addCourseToCollege = (collegeId, courseId, pricing) =>
-  authFetch(`/colleges/${collegeId}/courses`, { method: 'POST', body: JSON.stringify({ course_id: courseId, ...pricing }) })
+export const addCourseToCollege = (collegeId, courseId) =>
+  authFetch(`/colleges/${collegeId}/courses`, { method: 'POST', body: JSON.stringify({ course_id: courseId }) })
 export const removeCourseFromCollege = (collegeId, courseId) =>
   authFetch(`/colleges/${collegeId}/courses/${courseId}`, { method: 'DELETE' })
+
+export const fetchCollegeCourseExpenses = (collegeId, courseId, year = '') =>
+  authFetch(`/colleges/${collegeId}/courses/${courseId}/expenses${year ? `?year=${year}` : ''}`)
+export const addCollegeCourseExpense = (collegeId, courseId, expense) =>
+  authFetch(`/colleges/${collegeId}/courses/${courseId}/expenses`, { method: 'POST', body: JSON.stringify(expense) })
+export const updateCollegeCourseExpense = (collegeId, courseId, expenseId, expense) =>
+  authFetch(`/colleges/${collegeId}/courses/${courseId}/expenses/${expenseId}`, { method: 'PUT', body: JSON.stringify(expense) })
+export const deleteCollegeCourseExpense = (collegeId, courseId, expenseId) =>
+  authFetch(`/colleges/${collegeId}/courses/${courseId}/expenses/${expenseId}`, { method: 'DELETE' })
 export const fetchCourseExpenses = (courseId, year = '') =>
   authFetch(`/courses/${courseId}/expenses${year ? `?year=${year}` : ''}`);
 
@@ -47,3 +60,12 @@ export const updateCourseExpense = (courseId, expenseId, expense) =>
 
 export const deleteCourseExpense = (courseId, expenseId) =>
   authFetch(`/courses/${courseId}/expenses/${expenseId}`, { method: 'DELETE' });
+
+export const uploadLogo = (file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return authFetch('/upload', {
+    method: 'POST',
+    body: formData
+  })
+}

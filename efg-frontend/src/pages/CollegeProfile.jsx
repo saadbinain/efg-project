@@ -1,93 +1,165 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-
-const mockCollege = {
-  id: 101,
-  name: 'Tech University',
-  description: 'A leading institution offering cutting-edge programs in technology and business...',
-  branches: ['Main Campus', 'Satellite'],
-  locations: ['Manila', 'Cebu'],
-  contacts: { email: 'info@techuni.edu.ph', phone: '+63 2 8123 4567' },
-  social_media: { facebook: 'https://fb.com/techuni', twitter: 'https://twitter.com/techuni' },
-  logo_url: '',
-  highlight_pictures_urls: [],
-  courses: [
-    { id: 1, name: 'BS Computer Science', specific_tuition: 22000, specific_books: 800, specific_uniform: 500, specific_misc: 1200, years_to_complete: 4 },
-    { id: 2, name: 'BS Business Administration', specific_tuition: 18000, specific_books: 600, specific_uniform: 500, specific_misc: 900, years_to_complete: 4 },
-  ],
-}
+import { fetchCollegeById } from '../services/api'
 
 export default function CollegeProfile() {
   const { id } = useParams()
   const [college, setCollege] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    setCollege(mockCollege)
+    const load = async () => {
+      try {
+        setLoading(true)
+        const data = await fetchCollegeById(id)
+        setCollege(data)
+      } catch (err) {
+        setError(err.message || 'Failed to load college profile')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [id])
 
-  if (!college) return <div className="text-center py-10">Loading...</div>
-
-  return (
-    <div>
-      <Link to="/colleges" className="text-accent hover:underline text-sm">&larr; Back to colleges</Link>
-      
-      <div className="flex flex-col sm:flex-row items-start gap-6 mt-4 mb-8">
-        {college.logo_url ? (
-          <img src={college.logo_url} alt="" className="w-24 h-24 object-contain rounded-lg border" />
-        ) : (
-          <div className="w-24 h-24 bg-bgLight rounded-lg flex items-center justify-center text-gray-400 text-xl">Logo</div>
-        )}
-        <div>
-          <h1 className="text-3xl font-bold text-primary">{college.name}</h1>
-          <p className="text-gray-600 mt-2">{college.description}</p>
-          <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-            <span>📍 {college.locations.join(', ')}</span>
-            {college.contacts.phone && <span>📞 {college.contacts.phone}</span>}
-            {college.contacts.email && <span>✉️ {college.contacts.email}</span>}
-          </div>
-          {Object.keys(college.social_media).length > 0 && (
-            <div className="flex gap-3 mt-3">
-              {Object.entries(college.social_media).map(([platform, url]) => (
-                <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline capitalize text-sm">
-                  {platform}
-                </a>
-              ))}
-            </div>
-          )}
+  if (loading) return (
+    <div className="cd-page">
+      <div className="cd-hero cd-hero-skeleton">
+        <div className="cd-hero-inner">
+          <div className="cd-skeleton-line" style={{ width: '120px', height: '14px' }} />
+          <div className="cd-skeleton-line" style={{ width: '60%', height: '32px', marginTop: '1rem' }} />
+          <div className="cd-skeleton-line" style={{ width: '80%', height: '14px', marginTop: '0.75rem' }} />
         </div>
       </div>
+    </div>
+  )
 
-      {college.highlight_pictures_urls.length > 0 && (
-        <div className="mb-8 flex gap-2 overflow-x-auto">
-          {college.highlight_pictures_urls.map((pic, idx) => (
-            <img key={idx} src={pic} alt="" className="h-40 object-cover rounded-lg border" />
+  if (error || !college) return (
+    <div className="cd-page">
+      <div className="cd-error-state">
+        <span className="cd-error-icon">⚠️</span>
+        <h2>Something went wrong</h2>
+        <p>{error || 'College not found'}</p>
+        <Link to="/colleges" className="efg-btn-primary">← Back to colleges</Link>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="cd-page">
+      {/* ── HERO BANNER ── */}
+      <section className="cd-hero">
+        <div className="cd-hero-particles">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="efg-particle" style={{ '--delay': `${i * 1.2}s`, '--x': `${10 + i * 22}%` }} />
           ))}
         </div>
-      )}
-
-      <h2 className="text-2xl font-semibold text-primary mb-4">Courses Offered</h2>
-      <div className="grid gap-6 sm:grid-cols-2">
-        {college.courses.map(course => {
-          const yearlyTotal = course.specific_tuition + course.specific_books + course.specific_uniform + course.specific_misc
-          const totalCost = yearlyTotal * course.years_to_complete
-          return (
-            <div key={course.id} className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
-              <h3 className="text-lg font-semibold text-primary mb-3">{course.name}</h3>
-              <div className="space-y-1 text-sm text-gray-600">
-                <div className="flex justify-between"><span>Tuition</span><span className="font-medium">${course.specific_tuition.toLocaleString()}</span></div>
-                <div className="flex justify-between"><span>Books</span><span>${course.specific_books.toLocaleString()}</span></div>
-                <div className="flex justify-between"><span>Uniform</span><span>${course.specific_uniform.toLocaleString()}</span></div>
-                <div className="flex justify-between"><span>Misc</span><span>${course.specific_misc.toLocaleString()}</span></div>
-                <hr className="my-2" />
-                <div className="flex justify-between font-semibold"><span>Yearly Total</span><span className="text-highlight">${yearlyTotal.toLocaleString()}</span></div>
-                <div className="flex justify-between font-bold"><span>Total ({course.years_to_complete} yrs)</span><span className="text-highlight">${totalCost.toLocaleString()}</span></div>
-              </div>
-              <Link to={`/courses/${course.id}`} className="inline-block mt-4 text-accent text-sm hover:underline font-medium">
-                View course details →
-              </Link>
+        <div className="cd-hero-inner" style={{ padding: '2.5rem 2rem 3rem' }}>
+          <Link to="/colleges" className="cd-back-link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Back to colleges
+          </Link>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem', marginTop: '1rem' }}>
+            <div className="cd-college-logo" style={{ width: '80px', height: '80px', borderRadius: '16px', background: '#fff', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+              {college.logo_url ? (
+                <img src={college.logo_url} alt="" />
+              ) : (
+                <span style={{ fontSize: '2.2rem' }}>🏫</span>
+              )}
             </div>
-          )
-        })}
+            <div style={{ flex: '1', minWidth: '280px' }}>
+              <h1 className="cd-hero-title" style={{ margin: 0, fontSize: '2rem' }}>
+                {college.name}
+                {college.abbreviation && <span className="cd-hero-acronym">{college.abbreviation}</span>}
+              </h1>
+              {college.description && <p className="cd-hero-overview" style={{ marginTop: '0.5rem', marginBottom: 0 }}>{college.description}</p>}
+              
+              <div className="cd-hero-meta" style={{ marginTop: '0.75rem' }}>
+                {college.locations && college.locations.length > 0 && (
+                  <div className="cd-meta-chip">
+                    <span>📍</span> {Array.isArray(college.locations) ? college.locations.join(', ') : college.locations}
+                  </div>
+                )}
+                {college.contacts?.phone && (
+                  <div className="cd-meta-chip">
+                    <span>📞</span> {college.contacts.phone}
+                  </div>
+                )}
+                {college.contacts?.email && (
+                  <div className="cd-meta-chip">
+                    <span>✉️</span> {college.contacts.email}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="cd-body">
+        {/* ── COURSES OFFERED ── */}
+        <section className="cd-section">
+          <div className="cd-section-header" style={{ marginBottom: '2rem' }}>
+            <div className="cd-section-icon">📚</div>
+            <div>
+              <h2 className="cd-section-title">Programs Offered</h2>
+              <p className="cd-section-sub">Explore tuition fees, textbook costs, uniforms, and miscellaneous expense breakdowns</p>
+            </div>
+          </div>
+
+          {college.courses && college.courses.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {college.courses.map(course => {
+                const grandTotal = course.expenses
+                  ? course.expenses.reduce((sum, e) => sum + Number(e.amount), 0)
+                  : 0
+
+                return (
+                  <Link 
+                    key={course.id}
+                    to={`/courses/${course.id}?college_id=${id}`} 
+                    className="efg-course-grid-card"
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                        {course.acronym ? (
+                          <span className="efg-course-card-acro">{course.acronym}</span>
+                        ) : (
+                          <div />
+                        )}
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#3A9B8E', background: 'rgba(58,155,142,0.08)', padding: '0.2rem 0.5rem', borderRadius: '6px', whiteSpace: 'nowrap' }}>
+                          {course.years_to_complete} Yrs
+                        </span>
+                      </div>
+                      <h3 className="efg-course-card-title" style={{ marginTop: '0.25rem' }}>{course.name}</h3>
+                      {course.overview && (
+                        <p className="efg-course-card-overview">{course.overview}</p>
+                      )}
+                    </div>
+
+                    <div className="efg-course-card-footer">
+                      <div>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.15rem' }}>Estimated Tuition</span>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#E67E22' }}>₱{grandTotal.toLocaleString()}</span>
+                      </div>
+                      <span className="efg-course-card-hint">
+                        View Expenses
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="cd-empty-state">
+              <span className="cd-empty-icon">📚</span>
+              <p>No programs are currently linked to this school.</p>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   )

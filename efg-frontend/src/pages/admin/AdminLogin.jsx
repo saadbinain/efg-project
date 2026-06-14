@@ -25,35 +25,81 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-        <h1 className="text-2xl font-bold text-primary mb-6">Admin Login</h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-2 border rounded-md"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-4 py-2 border rounded-md"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
+    <div className="adm-login-page">
+      {/* Floating particles */}
+      <div className="adm-login-particles">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="efg-particle" style={{ '--delay': `${i * 1.4}s`, '--x': `${10 + i * 18}%` }} />
+        ))}
+      </div>
+
+      <div className="adm-login-card">
+        <div className="adm-login-header">
+          <img src="/efglogo.png" alt="EFG Logo" className="adm-login-logo" />
+          <h1 className="adm-login-title">Admin Portal</h1>
+          <p className="adm-login-subtitle">Sign in to manage your platform</p>
+        </div>
+
+        {error && (
+          <div className="adm-login-error">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/><path d="M8 5v3M8 10.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="adm-login-form">
+          <div className="adm-input-group">
+            <label className="adm-input-label">Email Address</label>
+            <div className="adm-input-wrap">
+              <svg className="adm-input-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M1 5l7 4 7-4" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <input
+                type="email"
+                placeholder="admin@efg.edu"
+                className="adm-input"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                id="admin-email-input"
+              />
+            </div>
+          </div>
+
+          <div className="adm-input-group">
+            <label className="adm-input-label">Password</label>
+            <div className="adm-input-wrap">
+              <svg className="adm-input-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="adm-input"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                id="admin-password-input"
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-accent text-white font-semibold rounded-md hover:bg-teal-700 transition"
+            className="adm-login-btn"
+            id="admin-login-submit"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (
+              <>
+                <span className="adm-spinner" />
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
+
+        <p className="adm-login-footer-text">
+          Educational Financial Guide — Admin Management
+        </p>
       </div>
     </div>
   )

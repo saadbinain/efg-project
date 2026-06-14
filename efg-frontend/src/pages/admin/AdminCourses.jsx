@@ -8,7 +8,7 @@ export default function AdminCourses() {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [editing, setEditing] = useState(null)  // course id or 'new'
+  const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ name: '', acronym: '', overview: '', years_to_complete: 4 })
 
   // Expense management state
@@ -113,122 +113,185 @@ export default function AdminCourses() {
     } catch (err) { setError(err.message) }
   }
 
-  if (loading) return <div className="p-4">Loading...</div>
+  if (loading) return (
+    <div className="adm-loading">
+      <span className="adm-spinner" />
+      Loading courses...
+    </div>
+  )
 
   return (
     <div>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {error && (
+        <div className="adm-error-banner">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/><path d="M8 5v3M8 10.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          {error}
+          <button onClick={() => setError('')} className="adm-error-dismiss">✕</button>
+        </div>
+      )}
 
       {!selectedCourse ? (
         <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-primary">Manage Courses</h1>
-            <button onClick={openAddCourse} className="bg-accent text-white px-4 py-2 rounded-md">
-              Add New Course
+          {/* Course List View */}
+          <div className="adm-page-header">
+            <div>
+              <h1 className="adm-page-title">Manage Courses</h1>
+              <p className="adm-page-subtitle">{courses.length} program{courses.length !== 1 ? 's' : ''} registered</p>
+            </div>
+            <button onClick={openAddCourse} className="adm-btn-primary" id="add-course-btn">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+              Add Course
             </button>
           </div>
-          <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-bgLight">
+
+          <div className="adm-table-wrap">
+            <table className="adm-table">
+              <thead>
                 <tr>
-                  <th className="py-2 px-4 text-left">Name (Acronym)</th>
-                  <th className="py-2 px-4 text-left">Years</th>
-                  <th className="py-2 px-4 text-right">Actions</th>
+                  <th>Program Name</th>
+                  <th>Years</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {courses.map(course => (
-                  <tr key={course.id} className="border-t">
-                    <td className="py-2 px-4">{course.name} {course.acronym && `(${course.acronym})`}</td>
-                    <td className="py-2 px-4">{course.years_to_complete}</td>
-                    <td className="py-2 px-4 text-right space-x-2">
-                      <button onClick={() => manageExpenses(course)} className="text-accent hover:underline">Expenses</button>
-                      <button onClick={() => openEditCourse(course)} className="text-primary hover:underline">Edit</button>
-                      <button onClick={() => handleDeleteCourse(course.id)} className="text-red-500 hover:underline">Delete</button>
+                  <tr key={course.id}>
+                    <td>
+                      <div className="adm-course-name-cell">
+                        <span className="adm-course-name">{course.name}</span>
+                        {course.acronym && <span className="adm-badge">{course.acronym}</span>}
+                      </div>
+                    </td>
+                    <td>
+                      <span className="adm-year-pill">{course.years_to_complete} yr{course.years_to_complete > 1 ? 's' : ''}</span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div className="adm-action-group">
+                        <button onClick={() => manageExpenses(course)} className="adm-action-link adm-action-teal">
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M11 4H6.5a2.5 2.5 0 000 5h3a2.5 2.5 0 010 5H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                          Expenses
+                        </button>
+                        <button onClick={() => openEditCourse(course)} className="adm-action-link adm-action-blue">
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+                          Edit
+                        </button>
+                        <button onClick={() => handleDeleteCourse(course.id)} className="adm-action-link adm-action-red">
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
+                {courses.length === 0 && (
+                  <tr><td colSpan="3" className="adm-empty-row">No courses found. Click "Add Course" to get started.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
         </>
       ) : (
+        /* Expense Management View */
         <div>
-          <button onClick={() => setSelectedCourse(null)} className="text-accent hover:underline mb-4 inline-block">
-            &larr; Back to Courses
+          <button onClick={() => setSelectedCourse(null)} className="adm-back-link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Back to Courses
           </button>
-          <h2 className="text-xl font-bold text-primary mb-4">
-            Expenses for {selectedCourse.name} ({selectedCourse.acronym})
-          </h2>
 
-          {/* Year selector */}
-          <div className="flex gap-2 mb-4">
+          <div className="adm-page-header">
+            <div>
+              <h1 className="adm-page-title">
+                {selectedCourse.name}
+                {selectedCourse.acronym && <span className="adm-badge" style={{ marginLeft: '0.5rem' }}>{selectedCourse.acronym}</span>}
+              </h1>
+              <p className="adm-page-subtitle">Expense management — {selectedCourse.years_to_complete} year program</p>
+            </div>
+          </div>
+
+          {/* Year tabs */}
+          <div className="adm-year-tabs">
             {Array.from({ length: selectedCourse.years_to_complete }, (_, i) => i + 1).map(year => (
               <button
                 key={year}
                 onClick={() => handleYearChange(year)}
-                className={`px-4 py-2 rounded ${selectedYear === year ? 'bg-primary text-white' : 'bg-white border'}`}
+                className={`adm-year-tab ${selectedYear === year ? 'adm-year-tab-active' : ''}`}
               >
                 Year {year}
               </button>
             ))}
           </div>
 
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Year {selectedYear} Items</h3>
-            <button onClick={openAddExpense} className="bg-accent text-white px-3 py-1 rounded text-sm">
+          <div className="adm-page-header" style={{ marginTop: '1.25rem' }}>
+            <h2 className="adm-page-title" style={{ fontSize: '1.1rem' }}>Year {selectedYear} Items</h2>
+            <button onClick={openAddExpense} className="adm-btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.8rem' }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
               Add Item
             </button>
           </div>
 
-          <table className="min-w-full bg-white rounded-lg shadow text-sm">
-            <thead className="bg-bgLight">
-              <tr>
-                <th className="py-2 px-4 text-left">Item</th>
-                <th className="py-2 px-4 text-right">Amount</th>
-                <th className="py-2 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.map(exp => (
-                <tr key={exp.id} className="border-t">
-                  <td className="py-2 px-4">{exp.item_name}</td>
-                  <td className="py-2 px-4 text-right">${Number(exp.amount).toLocaleString()}</td>
-                  <td className="py-2 px-4 text-right space-x-2">
-                    <button onClick={() => openEditExpense(exp)} className="text-primary hover:underline">Edit</button>
-                    <button onClick={() => handleDeleteExpense(exp.id)} className="text-red-500 hover:underline">Delete</button>
-                  </td>
+          <div className="adm-table-wrap">
+            <table className="adm-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th style={{ textAlign: 'right' }}>Amount</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {expenses.map(exp => (
+                  <tr key={exp.id}>
+                    <td className="adm-course-name">{exp.item_name}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                      ₱{Number(exp.amount).toLocaleString()}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div className="adm-action-group">
+                        <button onClick={() => openEditExpense(exp)} className="adm-action-link adm-action-blue">Edit</button>
+                        <button onClick={() => handleDeleteExpense(exp.id)} className="adm-action-link adm-action-red">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {expenses.length === 0 && (
+                  <tr><td colSpan="3" className="adm-empty-row">No expenses for Year {selectedYear}. Click "Add Item" to create one.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {/* Expense form modal */}
           {editingExpense !== null && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl p-6 w-full max-w-sm">
-                <h3 className="text-lg font-semibold mb-4">
-                  {editingExpense === 'new' ? 'Add Expense' : 'Edit Expense'}
+            <div className="adm-modal-overlay" onClick={closeExpenseForm}>
+              <div className="adm-modal" onClick={e => e.stopPropagation()}>
+                <h3 className="adm-modal-title">
+                  {editingExpense === 'new' ? 'Add Expense Item' : 'Edit Expense Item'}
                 </h3>
-                <form onSubmit={handleExpenseSubmit} className="space-y-3">
-                  <input
-                    placeholder="Item name (e.g., Tuition)"
-                    className="w-full border rounded px-3 py-2"
-                    value={expenseForm.item_name}
-                    onChange={e => setExpenseForm({...expenseForm, item_name: e.target.value})}
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Amount"
-                    className="w-full border rounded px-3 py-2"
-                    value={expenseForm.amount}
-                    onChange={e => setExpenseForm({...expenseForm, amount: +e.target.value})}
-                    required
-                  />
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button type="button" onClick={closeExpenseForm} className="px-3 py-1 border rounded">Cancel</button>
-                    <button type="submit" className="px-3 py-1 bg-accent text-white rounded">Save</button>
+                <form onSubmit={handleExpenseSubmit} className="adm-form">
+                  <div className="adm-input-group">
+                    <label className="adm-input-label">Item Name</label>
+                    <input
+                      placeholder="e.g., Tuition Fee"
+                      className="adm-input"
+                      value={expenseForm.item_name}
+                      onChange={e => setExpenseForm({...expenseForm, item_name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="adm-input-group">
+                    <label className="adm-input-label">Amount (₱)</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      className="adm-input"
+                      value={expenseForm.amount}
+                      onChange={e => setExpenseForm({...expenseForm, amount: +e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="adm-modal-actions">
+                    <button type="button" onClick={closeExpenseForm} className="adm-btn-cancel">Cancel</button>
+                    <button type="submit" className="adm-btn-primary">Save Item</button>
                   </div>
                 </form>
               </div>
@@ -237,25 +300,39 @@ export default function AdminCourses() {
         </div>
       )}
 
-      {/* Course add/edit modal (same as before but with acronym) */}
+      {/* Course add/edit modal */}
       {editing !== null && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold text-primary mb-4">
-              {editing === 'new' ? 'Add Course' : 'Edit Course'}
+        <div className="adm-modal-overlay" onClick={closeForm}>
+          <div className="adm-modal adm-modal-lg" onClick={e => e.stopPropagation()}>
+            <h2 className="adm-modal-title">
+              {editing === 'new' ? 'Add New Course' : 'Edit Course'}
             </h2>
-            <form onSubmit={handleCourseSubmit} className="space-y-3">
-              <input placeholder="Course Name" className="w-full border rounded px-3 py-2" value={form.name}
-                onChange={e => setForm({...form, name: e.target.value})} required />
-              <input placeholder="Acronym (e.g., BSCS)" className="w-full border rounded px-3 py-2" value={form.acronym}
-                onChange={e => setForm({...form, acronym: e.target.value})} />
-              <textarea placeholder="Description" className="w-full border rounded px-3 py-2" value={form.overview}
-                onChange={e => setForm({...form, overview: e.target.value})} />
-              <input type="number" placeholder="Years to Complete" className="w-full border rounded px-3 py-2"
-                value={form.years_to_complete} onChange={e => setForm({...form, years_to_complete: +e.target.value})} min="1" />
-              <div className="flex justify-end gap-2 pt-4">
-                <button type="button" onClick={closeForm} className="px-4 py-2 border rounded">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-accent text-white rounded">Save</button>
+            <form onSubmit={handleCourseSubmit} className="adm-form">
+              <div className="adm-input-group">
+                <label className="adm-input-label">Course Name</label>
+                <input placeholder="e.g., Bachelor of Science in Computer Science" className="adm-input" value={form.name}
+                  onChange={e => setForm({...form, name: e.target.value})} required />
+              </div>
+              <div className="adm-form-row">
+                <div className="adm-input-group">
+                  <label className="adm-input-label">Acronym</label>
+                  <input placeholder="e.g., BSCS" className="adm-input" value={form.acronym}
+                    onChange={e => setForm({...form, acronym: e.target.value})} />
+                </div>
+                <div className="adm-input-group">
+                  <label className="adm-input-label">Years to Complete</label>
+                  <input type="number" className="adm-input" value={form.years_to_complete}
+                    onChange={e => setForm({...form, years_to_complete: +e.target.value})} min="1" />
+                </div>
+              </div>
+              <div className="adm-input-group">
+                <label className="adm-input-label">Description</label>
+                <textarea placeholder="Brief overview of the program..." className="adm-textarea" value={form.overview}
+                  onChange={e => setForm({...form, overview: e.target.value})} />
+              </div>
+              <div className="adm-modal-actions">
+                <button type="button" onClick={closeForm} className="adm-btn-cancel">Cancel</button>
+                <button type="submit" className="adm-btn-primary">Save Course</button>
               </div>
             </form>
           </div>

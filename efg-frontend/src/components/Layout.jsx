@@ -1,39 +1,195 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { fetchStats, incrementStats } from '../services/api'
 
 export default function Layout() {
+  const location = useLocation()
+  const isHome = location.pathname === '/'
+
+  const [statsData, setStatsData] = useState({
+    courses_count: 50,
+    colleges_count: 20,
+    students_guided: 1000
+  })
+  const [localVoted, setLocalVoted] = useState(false)
+  const [showAd, setShowAd] = useState(false)
+
+  // Fetch initial statistics
+  useEffect(() => {
+    fetchStats()
+      .then(setStatsData)
+      .catch(() => {})
+  }, [])
+
+  // Timer: Whenever showAd becomes false, start a 20-second timer to show it again
+  useEffect(() => {
+    if (showAd) return
+
+    const timer = setTimeout(() => {
+      setLocalVoted(false) // Reset local vote state so they can vote again on popup re-appearance
+      setShowAd(true)
+    }, 20000) // 20 seconds delay
+
+    return () => clearTimeout(timer)
+  }, [showAd])
+
+  // Reset ad state immediately on route change
+  useEffect(() => {
+    setShowAd(false)
+    setLocalVoted(false)
+  }, [location.pathname])
+
+  const handleVote = async () => {
+    try {
+      const res = await incrementStats()
+      if (res.success) {
+        setStatsData(prev => ({
+          ...prev,
+          students_guided: res.students_guided
+        }))
+        setLocalVoted(true)
+        
+        // Let user see thank you message for 3.5 seconds, then slide it out
+        setTimeout(() => {
+          setShowAd(false)
+        }, 3500)
+      }
+    } catch (err) {
+      console.error("Failed to submit feedback:", err)
+    }
+  }
+
+  const handleCloseAd = () => {
+    setShowAd(false)
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-primary text-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center space-x-2 no-underline">
-              <span className="text-2xl font-bold tracking-tight">
-                EFG<span className="text-accent">.</span>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Sticky Navbar */}
+      <header style={{
+        background: '#1A2C4E',
+        color: '#fff',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px' }}>
+            {/* Logo */}
+            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              <img
+                src="/efglogo.png"
+                alt="EFG Logo"
+                style={{ height: 48, width: 'auto', objectFit: 'contain' }}
+              />
+              <span className="efg-nav-title">
+                Educational Financial Guidance
               </span>
             </Link>
-            <nav className="flex space-x-4 text-sm font-medium">
-              <Link to="/courses" className="hover:text-accent transition-colors px-3 py-2 rounded-md">
-                Courses
-              </Link>
-              <Link to="/colleges" className="hover:text-accent transition-colors px-3 py-2 rounded-md">
-                Colleges
-              </Link>
+
+            {/* Nav Links */}
+            <nav style={{ display: 'flex', gap: '0.25rem' }}>
+              {[
+                { label: 'Home', to: '/' },
+                { label: 'Explore Programs', to: '/courses' },
+                { label: 'Schools', to: '/colleges' },
+              ].map(({ label, to }) => {
+                const active = location.pathname === to
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    style={{
+                      padding: '0.4rem 0.85rem',
+                      borderRadius: 6,
+                      fontSize: '0.82rem',
+                      fontWeight: active ? 700 : 500,
+                      color: active ? '#E67E22' : 'rgba(255,255,255,0.85)',
+                      textDecoration: 'none',
+                      background: active ? 'rgba(230,126,34,0.12)' : 'transparent',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => {
+                      if (!active) {
+                        e.currentTarget.style.color = '#fff'
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!active) {
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
+                        e.currentTarget.style.background = 'transparent'
+                      }
+                    }}
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
             </nav>
           </div>
         </div>
       </header>
 
-      <main className="flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Outlet />
-        </div>
+      {/* Main Content — no wrapper for pages with their own hero */}
+      <main style={{ flexGrow: 1 }}>
+        {isHome || /^\/(courses|colleges)/.test(location.pathname) ? (
+          <Outlet context={{ statsData, handleVote, hasVoted: localVoted }} />
+        ) : (
+          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+            <Outlet context={{ statsData, handleVote, hasVoted: localVoted }} />
+          </div>
+        )}
       </main>
 
-      <footer className="bg-bgLight border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} Education Financial Guidance. All rights reserved.
+      {/* Sliding Feedback Popup Ad (Auto-repeating) */}
+      {!location.pathname.startsWith('/admin') && (
+        <div className={`efg-feedback-popup ${showAd ? 'efg-show' : ''}`}>
+          {!localVoted && (
+            <button onClick={handleCloseAd} className="efg-feedback-popup-close" aria-label="Close feedback card">
+              &times;
+            </button>
+          )}
+          
+          <div className="efg-feedback-popup-header">
+            <span className="efg-feedback-popup-icon">❤️</span>
+            <h3 className="efg-feedback-popup-title">
+              Did this website help you to be ready for college?
+            </h3>
+          </div>
+          
+          {!localVoted ? (
+            <>
+              <p className="efg-feedback-popup-desc">
+                Your feedback helps us understand our reach and keep EFG free.
+              </p>
+              <button onClick={handleVote} className="efg-feedback-popup-btn">
+                Yes, it helped me!
+              </button>
+            </>
+          ) : (
+            <div className="efg-feedback-popup-thanks">
+              Thank you! EFG has guided <strong>{statsData.students_guided.toLocaleString()}</strong> students.
+            </div>
+          )}
         </div>
-      </footer>
+      )}
+
+      {/* Footer */}
+      {!isHome && (
+        <footer style={{
+          background: '#1A2C4E',
+          color: 'rgba(255,255,255,0.55)',
+          padding: '1.25rem',
+          textAlign: 'center',
+          fontSize: '0.78rem',
+          marginTop: 'auto',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+        }}>
+          © {new Date().getFullYear()} Educational Financial Guidance. All rights reserved.
+        </footer>
+      )}
     </div>
   )
 }

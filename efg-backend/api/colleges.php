@@ -17,7 +17,7 @@ function handleColleges($db, $collegeId = null) {
 }
 
 function getColleges($db) {
-    $stmt = $db->query("SELECT id, name, logo_url, locations FROM colleges ORDER BY name");
+    $stmt = $db->query("SELECT id, name, logo_url, locations, abbreviation FROM colleges ORDER BY name");
     $colleges = $stmt->fetchAll();
     foreach ($colleges as &$col) {
         $col['locations'] = json_decode($col['locations'], true) ?? [];
@@ -43,14 +43,27 @@ function getCollegeById($db, $id) {
     $college['highlight_pictures_urls'] = json_decode($college['highlight_pictures_urls'], true) ?? [];
 
     $stmt2 = $db->prepare("
-        SELECT c.id, c.name, c.overview, c.years_to_complete,
-               cc.specific_tuition, cc.specific_books, cc.specific_uniform, cc.specific_misc
+        SELECT c.id, c.name, c.acronym, c.overview, c.years_to_complete, cc.id AS college_course_id
         FROM courses c
         JOIN college_courses cc ON cc.course_id = c.id AND cc.college_id = :college_id
         ORDER BY c.name
     ");
     $stmt2->execute(['college_id' => $id]);
     $courses = $stmt2->fetchAll();
+
+    // Fetch school-specific expenses for each course
+    $stmt3 = $db->prepare("
+        SELECT id, year_number, item_name, amount
+        FROM college_course_expenses
+        WHERE college_course_id = :college_course_id
+        ORDER BY year_number, item_name
+    ");
+
+    foreach ($courses as &$course) {
+        $stmt3->execute(['college_course_id' => $course['college_course_id']]);
+        $course['expenses'] = $stmt3->fetchAll();
+    }
+
     $college['courses'] = $courses;
     echo json_encode($college);
 }
