@@ -120,9 +120,9 @@ export default function Home() {
   const featuredCourses = Array.isArray(courses) ? courses.slice(0, 8) : []
 
   const currentStats = [
-    { value: statsData.courses_count, suffix: '+', label: 'Programs Offered' },
-    { value: statsData.colleges_count, suffix: '+', label: 'Partner Schools' },
-    { value: statsData.students_guided, suffix: '+', label: 'Students Guided' },
+    { value: Number(statsData?.courses_count) || 0, suffix: '+', label: 'Programs Offered' },
+    { value: Number(statsData?.colleges_count) || 0, suffix: '+', label: 'Partner Schools' },
+    { value: Number(statsData?.students_guided) || 0, suffix: '+', label: 'Students Guided' },
     { value: 100, suffix: '%', label: 'Free Access' },
   ]
 

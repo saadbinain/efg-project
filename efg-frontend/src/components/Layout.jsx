@@ -18,7 +18,11 @@ export default function Layout() {
   // Fetch initial statistics
   useEffect(() => {
     fetchStats()
-      .then(setStatsData)
+      .then(data => {
+        if (data && typeof data === 'object' && 'courses_count' in data) {
+          setStatsData(data);
+        }
+      })
       .catch(() => {})
   }, [])
 
