@@ -1,6 +1,4 @@
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? '/api'
-  : 'https://efg-backend.onrender.com/api';
+const API_BASE = '/api';  // Proxied by Vite → no CORS preflight overhead
 
 export const getLogoUrl = (url) => {
   if (!url) return '';
