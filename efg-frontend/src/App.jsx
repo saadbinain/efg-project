@@ -43,6 +43,9 @@ function App() {
           <Route path="courses" element={<AdminCourses />} />
           <Route path="colleges" element={<AdminColleges />} />
         </Route>
+
+        {/* Catch-all route to redirect back to home if no route matches */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
