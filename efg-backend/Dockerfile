@@ -17,5 +17,8 @@ WORKDIR /var/www/html
 # Copy the backend files to the container
 COPY . /var/www/html/
 
+# Grant www-data (Apache user) ownership of the files so it can read/write to the uploads folder
+RUN chown -R www-data:www-data /var/www/html
+
 # Expose port 80 for Render Web Service
 EXPOSE 80
