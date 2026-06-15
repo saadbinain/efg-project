@@ -24,15 +24,17 @@ export default function CollegeList() {
       })
   }, [])
 
-  const filteredColleges = colleges.filter(col => {
-    const nameMatch = col.name.toLowerCase().includes(search.toLowerCase())
-    const locationMatch = Array.isArray(col.locations)
-      ? col.locations.some(loc => loc.toLowerCase().includes(search.toLowerCase()))
-      : typeof col.locations === 'string'
-        ? col.locations.toLowerCase().includes(search.toLowerCase())
-        : false
-    return nameMatch || locationMatch
-  })
+  const filteredColleges = Array.isArray(colleges)
+    ? colleges.filter(col => {
+        const nameMatch = col.name.toLowerCase().includes(search.toLowerCase())
+        const locationMatch = Array.isArray(col.locations)
+          ? col.locations.some(loc => loc.toLowerCase().includes(search.toLowerCase()))
+          : typeof col.locations === 'string'
+            ? col.locations.toLowerCase().includes(search.toLowerCase())
+            : false
+        return nameMatch || locationMatch
+      })
+    : []
 
   const visibleColleges = filteredColleges.slice(0, visibleCount)
   const hasMore = visibleCount < filteredColleges.length

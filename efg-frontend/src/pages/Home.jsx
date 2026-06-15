@@ -116,8 +116,8 @@ export default function Home() {
     return () => observer.disconnect()
   }, [colleges, courses])
 
-  const featuredColleges = colleges.slice(0, 6)
-  const featuredCourses = courses.slice(0, 8)
+  const featuredColleges = Array.isArray(colleges) ? colleges.slice(0, 6) : []
+  const featuredCourses = Array.isArray(courses) ? courses.slice(0, 8) : []
 
   const currentStats = [
     { value: statsData.courses_count, suffix: '+', label: 'Programs Offered' },

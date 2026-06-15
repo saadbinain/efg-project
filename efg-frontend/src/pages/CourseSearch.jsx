@@ -72,7 +72,7 @@ export default function CourseSearch() {
             .catch(() => {})
     }
 
-    const visibleCourses = courses.slice(0, visibleCount)
+    const visibleCourses = Array.isArray(courses) ? courses.slice(0, visibleCount) : []
     const hasMore = visibleCount < courses.length
 
     return (
