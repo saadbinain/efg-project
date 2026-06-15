@@ -15,7 +15,7 @@ export default function CollegeList() {
   useEffect(() => {
     fetchColleges()
       .then(data => {
-        setColleges(data)
+        setColleges(Array.isArray(data) ? data : [])
         setLoading(false)
       })
       .catch(() => {

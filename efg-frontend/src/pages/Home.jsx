@@ -92,10 +92,10 @@ export default function Home() {
 
   useEffect(() => {
     fetchColleges()
-      .then(setColleges)
+      .then(data => setColleges(Array.isArray(data) ? data : []))
       .catch(() => {})
     fetchCourses()
-      .then(setCourses)
+      .then(data => setCourses(Array.isArray(data) ? data : []))
       .catch(() => {})
     setTimeout(() => setHeroLoaded(true), 150)
   }, [])

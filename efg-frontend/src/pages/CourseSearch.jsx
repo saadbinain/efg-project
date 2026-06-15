@@ -23,7 +23,7 @@ export default function CourseSearch() {
             setLoading(true)
             setError('')
             const data = await fetchCourses(query)
-            setCourses(data)
+            setCourses(Array.isArray(data) ? data : [])
             setVisibleCount(INITIAL_VISIBLE) // reset on new search
         } catch (err) {
             setError('Failed to load courses. Make sure the backend server is running.')
