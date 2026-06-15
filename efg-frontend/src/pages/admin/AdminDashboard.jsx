@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { fetchAdminCourses } from '../../services/adminApi'
 import { fetchAdminColleges } from '../../services/adminApi'
+import { ClipboardIcon } from '../../components/Icons'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ courses: 0, colleges: 0 })
@@ -64,7 +65,9 @@ export default function AdminDashboard() {
       </div>
 
       <div className="adm-welcome-card">
-        <div className="adm-welcome-icon">📋</div>
+        <div className="adm-welcome-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+          <ClipboardIcon size={28} strokeWidth={1.5} style={{ color: '#1A2C4E' }} />
+        </div>
         <h2 className="adm-welcome-title">Quick Start</h2>
         <p className="adm-welcome-text">
           Use the sidebar navigation to manage courses and colleges. You can add, edit, or remove programs and schools from the platform.

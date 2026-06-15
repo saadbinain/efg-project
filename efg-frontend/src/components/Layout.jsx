@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { fetchStats, incrementStats } from '../services/api'
+import { HeartIcon } from './Icons'
 
 export default function Layout() {
   const location = useLocation()
@@ -153,7 +154,7 @@ export default function Layout() {
           )}
           
           <div className="efg-feedback-popup-header">
-            <span className="efg-feedback-popup-icon">❤️</span>
+            <HeartIcon className="efg-feedback-popup-icon" size={24} fill="#E74C3C" stroke="#E74C3C" style={{ color: '#E74C3C' }} />
             <h3 className="efg-feedback-popup-title">
               Did this website help you to be ready for college?
             </h3>

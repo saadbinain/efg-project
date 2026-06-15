@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchColleges } from '../services/api'
+import { SearchIcon, SchoolIcon, MapPinIcon } from '../components/Icons'
 
 const INITIAL_VISIBLE = 6
 
@@ -59,7 +60,9 @@ export default function CollegeList() {
                 setVisibleCount(INITIAL_VISIBLE)
               }}
             />
-            <button type="button" style={{ pointerEvents: 'none' }}>🔍 Find</button>
+            <button type="button" style={{ pointerEvents: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'center' }}>
+              <SearchIcon size={16} strokeWidth={2.5} /> Find
+            </button>
           </div>
         </div>
       </section>
@@ -87,7 +90,9 @@ export default function CollegeList() {
           </div>
         ) : filteredColleges.length === 0 ? (
           <div className="cd-empty-state">
-            <span className="cd-empty-icon">🏫</span>
+            <span className="cd-empty-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+              <SchoolIcon size={48} strokeWidth={1.5} style={{ color: '#cbd5e1' }} />
+            </span>
             <p>No schools found matching "{search}". Try another search term.</p>
           </div>
         ) : (
@@ -112,14 +117,14 @@ export default function CollegeList() {
                     {col.logo_url ? (
                       <img src={col.logo_url} alt={col.name} />
                     ) : (
-                      <span className="cd-college-logo-fallback">🏫</span>
+                      <SchoolIcon size={24} style={{ color: '#64748b' }} />
                     )}
                   </div>
                   <div className="cd-college-info">
                     <h2 className="cd-college-name">{col.name}</h2>
                     {col.locations && col.locations.length > 0 && (
-                      <p style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.2rem' }}>
-                        <span>📍</span> {Array.isArray(col.locations) ? col.locations.join(', ') : col.locations}
+                      <p style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.2rem' }}>
+                        <MapPinIcon size={13} style={{ color: '#64748b' }} /> {Array.isArray(col.locations) ? col.locations.join(', ') : col.locations}
                       </p>
                     )}
                   </div>

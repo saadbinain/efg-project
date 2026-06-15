@@ -2,6 +2,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { fetchCourseById } from '../services/api'
 import { courseCache } from './CourseSearch'
+import { WarningIcon, BookIcon, SchoolIcon, DollarIcon, ClipboardIcon } from '../components/Icons'
 
 export default function CourseDetails() {
   const { id } = useParams()
@@ -51,7 +52,9 @@ export default function CourseDetails() {
   if (error) return (
     <div className="cd-page">
       <div className="cd-error-state">
-        <span className="cd-error-icon">⚠️</span>
+        <span className="cd-error-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+          <WarningIcon size={48} strokeWidth={1.5} style={{ color: '#dc2626' }} />
+        </span>
         <h2>Something went wrong</h2>
         <p>{error}</p>
         <Link to={collegeId ? `/colleges/${collegeId}` : "/courses"} className="efg-btn-primary">
@@ -63,7 +66,9 @@ export default function CourseDetails() {
   if (!course) return (
     <div className="cd-page">
       <div className="cd-error-state">
-        <span className="cd-error-icon">📚</span>
+        <span className="cd-error-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+          <BookIcon size={48} strokeWidth={1.5} style={{ color: '#E67E22' }} />
+        </span>
         <h2>Course not found</h2>
         <p>The course you're looking for doesn't exist or has been removed.</p>
         <Link to={collegeId ? `/colleges/${collegeId}` : "/courses"} className="efg-btn-primary">
@@ -106,15 +111,15 @@ export default function CourseDetails() {
 
           {course.college && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginTop: '0.25rem', marginBottom: '1.25rem' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px' }}>
-                <div style={{ width: '22px', height: '22px', borderRadius: '4px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', maxWidth: '100%' }}>
+                <div style={{ width: '22px', height: '22px', borderRadius: '4px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                   {course.college.logo_url ? (
                     <img src={course.college.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   ) : (
-                    <span style={{ fontSize: '0.8rem' }}>🏫</span>
+                    <SchoolIcon size={14} style={{ color: '#64748b' }} />
                   )}
                 </div>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#3A9B8E' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#3A9B8E', whiteSpace: 'normal', wordBreak: 'break-word' }}>
                   Offered by {course.college.name}
                 </span>
               </div>
@@ -158,7 +163,9 @@ export default function CourseDetails() {
         {/* ── EXPENSE BREAKDOWN ── */}
         <section className="cd-section">
           <div className="cd-section-header">
-            <div className="cd-section-icon">💰</div>
+            <div className="cd-section-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+              <DollarIcon size={20} strokeWidth={2} style={{ color: '#3A9B8E' }} />
+            </div>
             <div>
               <h2 className="cd-section-title">
                 {course.college ? 'College Course Expenses' : 'Expected Expenses'}
@@ -206,7 +213,9 @@ export default function CourseDetails() {
             </div>
           ) : (
             <div className="cd-empty-state">
-              <span className="cd-empty-icon">📋</span>
+              <span className="cd-empty-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ClipboardIcon size={48} strokeWidth={1.5} style={{ color: '#cbd5e1' }} />
+              </span>
               <p>No expense details available yet for this course.</p>
             </div>
           )}
@@ -215,7 +224,9 @@ export default function CourseDetails() {
         {/* ── COLLEGES OFFERING ── */}
         <section className="cd-section">
           <div className="cd-section-header">
-            <div className="cd-section-icon">🏫</div>
+            <div className="cd-section-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+              <SchoolIcon size={20} strokeWidth={2} style={{ color: '#3A9B8E' }} />
+            </div>
             <div>
               <h2 className="cd-section-title">Schools Offering This Program</h2>
               <p className="cd-section-sub">
@@ -239,7 +250,7 @@ export default function CourseDetails() {
                     {col.logo_url ? (
                       <img src={col.logo_url} alt={col.name} />
                     ) : (
-                      <span className="cd-college-logo-fallback">🏫</span>
+                      <SchoolIcon size={24} style={{ color: '#64748b' }} />
                     )}
                   </div>
                   <div className="cd-college-info">
@@ -266,7 +277,9 @@ export default function CourseDetails() {
             </div>
           ) : (
             <div className="cd-empty-state">
-              <span className="cd-empty-icon">🏫</span>
+              <span className="cd-empty-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                <SchoolIcon size={48} strokeWidth={1.5} style={{ color: '#cbd5e1' }} />
+              </span>
               <p>No schools currently offering this program.</p>
             </div>
           )}

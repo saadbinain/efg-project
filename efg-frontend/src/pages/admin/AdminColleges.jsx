@@ -4,6 +4,7 @@ import {
   fetchAdminCourses, fetchCollegeCourses, addCourseToCollege, removeCourseFromCollege,
   fetchCollegeCourseExpenses, addCollegeCourseExpense, updateCollegeCourseExpense, deleteCollegeCourseExpense
 } from '../../services/adminApi'
+import { SchoolIcon } from '../../components/Icons'
 
 export default function AdminColleges() {
   const [colleges, setColleges] = useState([])
@@ -518,7 +519,7 @@ export default function AdminColleges() {
                         {college.logo_url ? (
                           <img src={college.logo_url} alt="" />
                         ) : (
-                          <span>🏫</span>
+                          <SchoolIcon size={24} style={{ color: '#64748b' }} />
                         )}
                       </div>
                     </td>

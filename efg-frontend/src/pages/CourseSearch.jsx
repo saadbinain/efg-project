@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchCourses, fetchCourseById } from '../services/api'
+import { SearchIcon } from '../components/Icons'
 
 // Module-level cache shared with CourseDetails — prefetched data lives here
 export const courseCache = {}
@@ -94,7 +95,9 @@ export default function CourseSearch() {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
-                        <button type="submit">🔍 Search</button>
+                        <button type="submit" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'center' }}>
+                            <SearchIcon size={16} strokeWidth={2.5} /> Search
+                        </button>
                     </form>
                 </div>
             </section>
@@ -122,7 +125,7 @@ export default function CourseSearch() {
                     </div>
                 ) : courses.length === 0 ? (
                     <div className="cd-empty-state">
-                        <span className="cd-empty-icon">🔍</span>
+                        <span className="cd-empty-icon"><SearchIcon size={48} strokeWidth={1.5} style={{ color: '#94a3b8' }} /></span>
                         <p>No courses found matching "{search}". Try another term.</p>
                     </div>
                 ) : (

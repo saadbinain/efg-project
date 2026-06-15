@@ -1399,7 +1399,7 @@ a:hover { text-decoration: underline; }
 .cd-college-card {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.85rem;
   padding: 1.1rem 1.25rem;
   background: #fff;
@@ -1487,6 +1487,8 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
   border-radius: 5px;
   padding: 1px 0;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .cd-pricing-specific {
@@ -1503,6 +1505,7 @@ a:hover { text-decoration: underline; }
   opacity: 0;
   transform: translateX(-4px);
   transition: all 0.25s;
+  align-self: center;
 }
 
 .cd-college-card:hover .cd-college-arrow {

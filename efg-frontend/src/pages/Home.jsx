@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { fetchCourses, fetchColleges } from '../services/api'
+import { TargetIcon, SearchIcon, DollarIcon, HandshakeIcon, BookIcon, CheckIcon, SchoolIcon } from '../components/Icons'
 
 const POPULAR_DEGREES = [
   'Education (BSEd, BEEd, BECEd)',
@@ -18,22 +19,22 @@ const STATS = [
 
 const WHY_EFG = [
   {
-    icon: '🎯',
+    icon: 'target',
     title: 'Accurate Information',
     desc: 'Up-to-date tuition fees, program details, and admission requirements sourced directly from institutions.',
   },
   {
-    icon: '🔍',
+    icon: 'search',
     title: 'Easy Comparison',
     desc: 'Compare programs and schools side by side to find the best fit for your academic goals and budget.',
   },
   {
-    icon: '💰',
+    icon: 'dollar',
     title: 'Financial Clarity',
     desc: 'Transparent cost breakdowns so families can plan ahead — no hidden fees, no surprises.',
   },
   {
-    icon: '🤝',
+    icon: 'handshake',
     title: 'Trusted Platform',
     desc: 'Backed by province-wide partnerships with educational institutions and government support.',
   },
@@ -207,7 +208,7 @@ export default function Home() {
                   style={{ '--stagger': `${i * 0.06}s` }}
                   id={`program-card-${c.id}`}
                 >
-                  <div className="efg-program-icon">📚</div>
+                  <div className="efg-program-icon"><BookIcon size={20} strokeWidth={2} style={{ color: '#3A9B8E' }} /></div>
                   <div className="efg-program-info">
                     <h3 className="efg-program-name">{c.name}</h3>
                     {c.acronym && <span className="efg-program-badge">{c.acronym}</span>}
@@ -242,7 +243,7 @@ export default function Home() {
                     to="/courses"
                     className="efg-popular-item"
                   >
-                    <span className="efg-popular-item-check">✓</span>
+                    <span className="efg-popular-item-check"><CheckIcon size={12} strokeWidth={3} /></span>
                     <span style={{ flex: '1' }}>{deg}</span>
                   </Link>
                 ))}
@@ -275,7 +276,7 @@ export default function Home() {
                 <div className="efg-school-logo">
                   {col.logo_url
                     ? <img src={col.logo_url} alt={col.name} />
-                    : <span className="efg-school-logo-fallback">🏫</span>
+                    : <SchoolIcon size={24} style={{ color: '#64748b' }} />
                   }
                 </div>
                 <h3 className="efg-school-name">{col.name}</h3>
@@ -284,7 +285,7 @@ export default function Home() {
             )) : (
               [...Array(6)].map((_, i) => (
                 <div key={i} className="efg-school-card efg-skeleton-card">
-                  <div className="efg-school-logo"><span className="efg-school-logo-fallback">🏫</span></div>
+                  <div className="efg-school-logo"><SchoolIcon size={24} style={{ color: '#cbd5e1' }} /></div>
                   <div className="efg-skeleton-line" style={{ width: '70%' }} />
                   <div className="efg-skeleton-line" style={{ width: '40%' }} />
                 </div>
@@ -319,7 +320,12 @@ export default function Home() {
                 className={`efg-why-card ${visibleSections.has('why') ? 'efg-animate-up' : ''}`}
                 style={{ '--stagger': `${i * 0.1}s` }}
               >
-                <span className="efg-why-icon">{item.icon}</span>
+                <span className="efg-why-icon">
+                  {item.icon === 'target' && <TargetIcon size={24} strokeWidth={1.5} style={{ color: '#E67E22' }} />}
+                  {item.icon === 'search' && <SearchIcon size={24} strokeWidth={1.5} style={{ color: '#E67E22' }} />}
+                  {item.icon === 'dollar' && <DollarIcon size={24} strokeWidth={1.5} style={{ color: '#E67E22' }} />}
+                  {item.icon === 'handshake' && <HandshakeIcon size={24} strokeWidth={1.5} style={{ color: '#E67E22' }} />}
+                </span>
                 <h3 className="efg-why-title">{item.title}</h3>
                 <p className="efg-why-desc">{item.desc}</p>
               </div>
