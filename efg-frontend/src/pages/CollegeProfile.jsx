@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { fetchCollegeById } from '../services/api'
+import { fetchCollegeById, getLogoUrl } from '../services/api'
 import { WarningIcon, SchoolIcon, MapPinIcon, PhoneIcon, MailIcon, BookIcon, SearchIcon } from '../components/Icons'
 
 export default function CollegeProfile() {
@@ -89,7 +89,7 @@ export default function CollegeProfile() {
                 marginBottom: '1rem'
               }}>
                 {college.logo_url ? (
-                  <img src={college.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <img src={getLogoUrl(college.logo_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 ) : (
                   <SchoolIcon size={48} style={{ color: '#64748b' }} />
                 )}

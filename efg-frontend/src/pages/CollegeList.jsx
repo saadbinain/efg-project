@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchColleges } from '../services/api'
+import { fetchColleges, getLogoUrl } from '../services/api'
 import { SearchIcon, SchoolIcon, MapPinIcon } from '../components/Icons'
 
 const INITIAL_VISIBLE = 6
@@ -117,7 +117,7 @@ export default function CollegeList() {
                   <div className="cd-college-card-accent" />
                   <div className="cd-college-logo">
                     {col.logo_url ? (
-                      <img src={col.logo_url} alt={col.name} />
+                      <img src={getLogoUrl(col.logo_url)} alt={col.name} />
                     ) : (
                       <SchoolIcon size={24} style={{ color: '#64748b' }} />
                     )}

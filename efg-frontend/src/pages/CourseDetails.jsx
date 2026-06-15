@@ -1,6 +1,6 @@
 import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { fetchCourseById } from '../services/api'
+import { fetchCourseById, getLogoUrl } from '../services/api'
 import { courseCache } from './CourseSearch'
 import { WarningIcon, BookIcon, SchoolIcon, DollarIcon, ClipboardIcon } from '../components/Icons'
 
@@ -114,7 +114,7 @@ export default function CourseDetails() {
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', maxWidth: '100%' }}>
                 <div style={{ width: '22px', height: '22px', borderRadius: '4px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                   {course.college.logo_url ? (
-                    <img src={course.college.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src={getLogoUrl(course.college.logo_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   ) : (
                     <SchoolIcon size={14} style={{ color: '#64748b' }} />
                   )}
@@ -248,7 +248,7 @@ export default function CourseDetails() {
                   <div className="cd-college-card-accent" />
                   <div className="cd-college-logo">
                     {col.logo_url ? (
-                      <img src={col.logo_url} alt={col.name} />
+                      <img src={getLogoUrl(col.logo_url)} alt={col.name} />
                     ) : (
                       <SchoolIcon size={24} style={{ color: '#64748b' }} />
                     )}

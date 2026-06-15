@@ -1,5 +1,14 @@
 const API_BASE = '/api';  // Proxied by Vite → no CORS preflight overhead
 
+export const getLogoUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const backendBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8000'
+    : 'https://efg-backend.onrender.com';
+  return `${backendBase}${url}`;
+};
+
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
   const config = {

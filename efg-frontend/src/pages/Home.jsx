@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { fetchCourses, fetchColleges } from '../services/api'
+import { fetchCourses, fetchColleges, getLogoUrl } from '../services/api'
 import { TargetIcon, SearchIcon, DollarIcon, HandshakeIcon, BookIcon, CheckIcon, SchoolIcon } from '../components/Icons'
 
 const POPULAR_DEGREES = [
@@ -275,7 +275,7 @@ export default function Home() {
                 <div className="efg-school-card-accent" />
                 <div className="efg-school-logo">
                   {col.logo_url
-                    ? <img src={col.logo_url} alt={col.name} />
+                    ? <img src={getLogoUrl(col.logo_url)} alt={col.name} />
                     : <SchoolIcon size={24} style={{ color: '#64748b' }} />
                   }
                 </div>

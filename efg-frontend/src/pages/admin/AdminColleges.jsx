@@ -5,6 +5,7 @@ import {
   fetchCollegeCourseExpenses, addCollegeCourseExpense, updateCollegeCourseExpense, deleteCollegeCourseExpense
 } from '../../services/adminApi'
 import { SchoolIcon } from '../../components/Icons'
+import { getLogoUrl } from '../../services/api'
 
 export default function AdminColleges() {
   const [colleges, setColleges] = useState([])
@@ -517,7 +518,7 @@ export default function AdminColleges() {
                     <td>
                       <div className="adm-college-logo">
                         {college.logo_url ? (
-                          <img src={college.logo_url} alt="" />
+                          <img src={getLogoUrl(college.logo_url)} alt="" />
                         ) : (
                           <SchoolIcon size={24} style={{ color: '#64748b' }} />
                         )}
@@ -601,7 +602,7 @@ export default function AdminColleges() {
                     <div className="adm-logo-upload-zone">
                       {form.logo_url ? (
                         <div className="adm-logo-upload-preview">
-                          <img src={form.logo_url} alt="Uploaded logo preview" />
+                          <img src={getLogoUrl(form.logo_url)} alt="Uploaded logo preview" />
                           <button 
                             type="button" 
                             className="adm-logo-remove-btn"
