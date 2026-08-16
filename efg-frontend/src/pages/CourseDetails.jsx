@@ -1,13 +1,14 @@
-import { useParams, Link, useSearchParams } from 'react-router-dom'
+import { useParams, Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { fetchCourseById, getLogoUrl } from '../services/api'
 import { courseCache } from './CourseSearch'
-import { WarningIcon, BookIcon, SchoolIcon, DollarIcon, ClipboardIcon } from '../components/Icons'
+import { WarningIcon, BookIcon, SchoolIcon, DollarIcon, ClipboardIcon, DownloadIcon } from '../components/Icons'
 
 export default function CourseDetails() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const collegeId = searchParams.get('college_id')
+  const { setShowAd } = useOutletContext() || {}
   
   const cacheKey = collegeId ? `${id}_col_${collegeId}` : id
 
@@ -84,6 +85,13 @@ export default function CourseDetails() {
 
   return (
     <div className="cd-page">
+      {/* ── PRINT-ONLY HEADER ── */}
+      <div className="print-header no-screen">
+        <div className="print-header-brand">Educational Financial Guide (EFG)</div>
+        <div className="print-header-title">Tuition &amp; Fees Expense Report</div>
+        <div className="print-header-date">Generated on {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+      </div>
+
       {/* ── HERO BANNER ── */}
       <section className="cd-hero">
         <div className="cd-hero-particles">
@@ -177,10 +185,20 @@ export default function CourseDetails() {
               </p>
             </div>
             {grandTotal > 0 && (
-              <div className="cd-grand-total-badge">
-                <span className="cd-gt-label">Grand Total</span>
-                <span className="cd-gt-value">₱{grandTotal.toLocaleString()}</span>
-              </div>
+              <button 
+                onClick={() => {
+                  const trigger = setShowAd || window.setShowAd
+                  if (trigger) trigger(true)
+                  setTimeout(() => {
+                    window.print()
+                  }, 500)
+                }}
+                className="efg-btn-download no-print"
+                style={{ marginLeft: 'auto' }}
+              >
+                <DownloadIcon size={14} />
+                Download PDF
+              </button>
             )}
           </div>
 
@@ -222,7 +240,7 @@ export default function CourseDetails() {
         </section>
 
         {/* ── COLLEGES OFFERING ── */}
-        <section className="cd-section">
+        <section className="cd-section no-print">
           <div className="cd-section-header">
             <div className="cd-section-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
               <SchoolIcon size={20} strokeWidth={2} style={{ color: '#3A9B8E' }} />

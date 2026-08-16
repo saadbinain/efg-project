@@ -15,6 +15,14 @@ export default function Layout() {
   const [localVoted, setLocalVoted] = useState(false)
   const [showAd, setShowAd] = useState(false)
 
+  // Register state setter globally as a fallback
+  useEffect(() => {
+    window.setShowAd = setShowAd;
+    return () => {
+      delete window.setShowAd;
+    };
+  }, [setShowAd])
+
   // Fetch initial statistics
   useEffect(() => {
     fetchStats()
@@ -26,17 +34,7 @@ export default function Layout() {
       .catch(() => {})
   }, [])
 
-  // Timer: Whenever showAd becomes false, start a 20-second timer to show it again
-  useEffect(() => {
-    if (showAd) return
 
-    const timer = setTimeout(() => {
-      setLocalVoted(false) // Reset local vote state so they can vote again on popup re-appearance
-      setShowAd(true)
-    }, 20000) // 20 seconds delay
-
-    return () => clearTimeout(timer)
-  }, [showAd])
 
   // Reset ad state immediately on route change
   useEffect(() => {
@@ -97,8 +95,9 @@ export default function Layout() {
             <nav style={{ display: 'flex', gap: '0.25rem' }}>
               {[
                 { label: 'Home', to: '/' },
-                { label: 'Explore Programs', to: '/courses' },
+                { label: 'Programs', to: '/courses' },
                 { label: 'Schools', to: '/colleges' },
+                { label: 'About us', to: '/about' },
               ].map(({ label, to }) => {
                 const active = location.pathname === to
                 return (
@@ -140,17 +139,19 @@ export default function Layout() {
       {/* Main Content — no wrapper for pages with their own hero */}
       <main style={{ flexGrow: 1 }}>
         {isHome || /^\/(courses|colleges)/.test(location.pathname) ? (
-          <Outlet context={{ statsData, handleVote, hasVoted: localVoted }} />
+          <Outlet context={{ statsData, handleVote, hasVoted: localVoted, setShowAd }} />
         ) : (
           <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-            <Outlet context={{ statsData, handleVote, hasVoted: localVoted }} />
+            <Outlet context={{ statsData, handleVote, hasVoted: localVoted, setShowAd }} />
           </div>
         )}
       </main>
 
       {/* Sliding Feedback Popup Ad (Auto-repeating) */}
       {!location.pathname.startsWith('/admin') && (
-        <div className={`efg-feedback-popup ${showAd ? 'efg-show' : ''}`}>
+        <>
+          {showAd && <div className="efg-popup-backdrop no-print" onClick={handleCloseAd} />}
+          <div className={`efg-feedback-popup ${showAd ? 'efg-show' : ''}`}>
           {!localVoted && (
             <button onClick={handleCloseAd} className="efg-feedback-popup-close" aria-label="Close feedback card">
               &times;
@@ -179,7 +180,8 @@ export default function Layout() {
             </div>
           )}
         </div>
-      )}
+      </>
+    )}
 
       {/* Footer */}
       {!isHome && (

@@ -5,6 +5,7 @@ import CourseSearch from './pages/CourseSearch'
 import CourseDetails from './pages/CourseDetails'
 import CollegeList from './pages/CollegeList'
 import CollegeProfile from './pages/CollegeProfile'
+import AboutUs from './pages/AboutUs'
 
 // Admin imports
 import AdminLayout from './components/AdminLayout'
@@ -25,6 +26,7 @@ function App() {
           <Route path="/courses/:id" element={<CourseDetails />} />
           <Route path="/colleges" element={<CollegeList />} />
           <Route path="/colleges/:id" element={<CollegeProfile />} />
+          <Route path="/about" element={<AboutUs />} />
         </Route>
 
         {/* Admin login (no layout) */}
