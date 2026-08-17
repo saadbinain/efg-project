@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { fetchCourseById, getLogoUrl } from '../services/api'
 import { courseCache } from './CourseSearch'
 import { WarningIcon, BookIcon, SchoolIcon, DollarIcon, ClipboardIcon, DownloadIcon } from '../components/Icons'
+import { generateCourseExpensePDF } from '../utils/pdfExport'
 
 export default function CourseDetails() {
   const { id } = useParams()
@@ -189,9 +190,7 @@ export default function CourseDetails() {
                 onClick={() => {
                   const trigger = setShowAd || window.setShowAd
                   if (trigger) trigger(true)
-                  setTimeout(() => {
-                    window.print()
-                  }, 500)
+                  generateCourseExpensePDF(course, grandTotal)
                 }}
                 className="efg-btn-download no-print"
                 style={{ marginLeft: 'auto' }}

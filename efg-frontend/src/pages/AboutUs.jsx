@@ -48,7 +48,7 @@ export default function AboutUs() {
         </p>
       </section>
 
-      <section className="efg-about-section reverse" style={{ gridTemplateColumns: '1.1fr 0.9fr' }}>
+      <section className="efg-about-section reverse">
         <div className="efg-about-video-container">
           <img 
             src={storyImg} 

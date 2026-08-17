@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchCourses, fetchCourseById } from '../services/api'
 import { SearchIcon } from '../components/Icons'
 
@@ -9,7 +9,9 @@ export const courseCache = {}
 const INITIAL_VISIBLE = 6
 
 export default function CourseSearch() {
-    const [search, setSearch] = useState('')
+    const [searchParams] = useSearchParams()
+    const urlQuery = searchParams.get('q') || ''
+    const [search, setSearch] = useState(urlQuery)
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -32,17 +34,24 @@ export default function CourseSearch() {
         }
     }
 
-    // Live search effect
+    // Sync if URL search param changes
+    useEffect(() => {
+        const q = searchParams.get('q') || ''
+        setSearch(q)
+        loadCourses(q)
+    }, [searchParams])
+
+    // Live search debounce effect for typing
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false
-            loadCourses('')
             return
         }
 
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current)
         }
+
 
         debounceTimeoutRef.current = setTimeout(() => {
             loadCourses(search)

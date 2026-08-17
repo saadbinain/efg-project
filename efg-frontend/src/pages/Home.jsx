@@ -4,10 +4,34 @@ import { fetchCourses, fetchColleges, getLogoUrl } from '../services/api'
 import { TargetIcon, SearchIcon, DollarIcon, HandshakeIcon, BookIcon, CheckIcon, SchoolIcon } from '../components/Icons'
 
 const POPULAR_DEGREES = [
-  'Education (BSEd, BEEd, BECEd)',
-  'BS Nursing',
-  'BS Social Work',
-  'BS Criminology',
+  {
+    name: 'Education (BSEd, BEEd, BECEd)',
+    shortName: 'Education',
+    category: 'Teaching & Pedagogy',
+    image: '/popular-degrees/pexels-pavel-danilyuk-8423012.jpg',
+    query: 'Education',
+  },
+  {
+    name: 'BS Nursing',
+    shortName: 'BS Nursing',
+    category: 'Healthcare & Medicine',
+    image: '/popular-degrees/Gemini_Generated_Image_regw3fregw3fregw.jpg',
+    query: 'Nursing',
+  },
+  {
+    name: 'BS Social Work',
+    shortName: 'BS Social Work',
+    category: 'Community & Public Service',
+    image: '/popular-degrees/Gemini_Generated_Image_i9tdi1i9tdi1i9td.jpg',
+    query: 'Social Work',
+  },
+  {
+    name: 'BS Criminology',
+    shortName: 'BS Criminology',
+    category: 'Law Enforcement & Security',
+    image: '/popular-degrees/Gemini_Generated_Image_mjyu12mjyu12mjyu.jpg',
+    query: 'Criminology',
+  },
 ]
 
 const STATS = [
@@ -88,7 +112,18 @@ export default function Home() {
   const [courses, setCourses] = useState([])
   const [heroLoaded, setHeroLoaded] = useState(false)
   const [visibleSections, setVisibleSections] = useState(new Set())
+  const [activeSlide, setActiveSlide] = useState(0)
+  const [isSlidePaused, setIsSlidePaused] = useState(false)
   const { statsData } = useOutletContext()
+
+  // Auto-advance slideshow every 3.5s (pauses on hover)
+  useEffect(() => {
+    if (isSlidePaused) return
+    const timer = setInterval(() => {
+      setActiveSlide(prev => (prev + 1) % POPULAR_DEGREES.length)
+    }, 3500)
+    return () => clearInterval(timer)
+  }, [isSlidePaused])
 
   useEffect(() => {
     fetchColleges()
@@ -229,23 +264,112 @@ export default function Home() {
           </div>
 
           {/* Popular Degrees Column */}
-          <div style={{ flex: '1', minWidth: '280px', display: 'flex' }}>
+          <div style={{ flex: '1', minWidth: '320px', display: 'flex' }}>
             <div className="efg-popular-sidebar">
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#3A9B8E', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem', display: 'block' }}>Trending Now</span>
-              <h2 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#1A2C4E', marginBottom: '0.5rem', lineHeight: '1.2' }}>Popular Degrees</h2>
-              <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-                Highly sought-after paths by students in the province. Click to see details.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: 'auto' }}>
+              <div className="efg-popular-header">
+                <span className="efg-popular-tag">Trending Now</span>
+                <h2 className="efg-popular-title">Popular Degrees</h2>
+                <p className="efg-popular-subtitle">
+                  Highly sought-after paths by students in the province. Click to see details.
+                </p>
+              </div>
+
+              {/* ── IMAGE SLIDESHOW ── */}
+              <div 
+                className="efg-slideshow-container"
+                onMouseEnter={() => setIsSlidePaused(true)}
+                onMouseLeave={() => setIsSlidePaused(false)}
+              >
+                <div className="efg-slideshow-track">
+                  {POPULAR_DEGREES.map((deg, i) => {
+                    const isActive = i === activeSlide
+                    return (
+                      <Link
+                        key={i}
+                        to={`/courses?q=${encodeURIComponent(deg.query)}`}
+                        className={`efg-slide ${isActive ? 'active' : ''}`}
+                        aria-hidden={!isActive}
+                        tabIndex={isActive ? 0 : -1}
+                      >
+                        <img
+                          src={deg.image}
+                          alt={deg.name}
+                          className="efg-slide-img"
+                        />
+                        <div className="efg-slide-overlay">
+                          <div className="efg-slide-meta">
+                            <span className="efg-slide-badge">#{i + 1} Trending</span>
+                            <span className="efg-slide-category">{deg.category}</span>
+                          </div>
+                          <h4 className="efg-slide-title">{deg.name}</h4>
+                          <span className="efg-slide-cta">
+                            Explore Degree Details
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </span>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+
+                {/* Slideshow Arrows */}
+                <button
+                  type="button"
+                  className="efg-slide-nav efg-slide-prev"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setActiveSlide(prev => (prev - 1 + POPULAR_DEGREES.length) % POPULAR_DEGREES.length)
+                  }}
+                  aria-label="Previous degree slide"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                <button
+                  type="button"
+                  className="efg-slide-nav efg-slide-next"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setActiveSlide(prev => (prev + 1) % POPULAR_DEGREES.length)
+                  }}
+                  aria-label="Next degree slide"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+
+                {/* Dots Indicator */}
+                <div className="efg-slideshow-dots">
+                  {POPULAR_DEGREES.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className={`efg-slide-dot ${i === activeSlide ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setActiveSlide(i)
+                      }}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* ── INTERACTIVE DEGREE SELECTOR BUTTONS ── */}
+              <div className="efg-popular-pills">
                 {POPULAR_DEGREES.map((deg, i) => (
-                  <Link
+                  <button
                     key={i}
-                    to="/courses"
-                    className="efg-popular-item"
+                    type="button"
+                    className={`efg-popular-pill ${i === activeSlide ? 'active' : ''}`}
+                    onClick={() => setActiveSlide(i)}
                   >
-                    <span className="efg-popular-item-check"><CheckIcon size={12} strokeWidth={3} /></span>
-                    <span style={{ flex: '1' }}>{deg}</span>
-                  </Link>
+                    <span className="efg-popular-pill-num">#{i + 1}</span>
+                    <span className="efg-popular-pill-text">{deg.shortName}</span>
+                  </button>
                 ))}
               </div>
             </div>
