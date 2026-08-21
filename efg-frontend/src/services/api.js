@@ -1,11 +1,20 @@
-const API_BASE = '/api';  // Proxied by Vite → no CORS preflight overhead
+const getBackendBase = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : 'https://efg-backend.onrender.com';
+};
+
+const API_BASE = `${getBackendBase()}/api`;
 
 export const getLogoUrl = (url) => {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
   const backendBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
-    : 'https://efg-backend.onrender.com';
+    : (import.meta.env.VITE_API_URL || 'https://efg-backend.onrender.com');
   return `${backendBase}${url}`;
 };
 

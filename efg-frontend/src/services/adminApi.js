@@ -1,6 +1,15 @@
 import { supabase } from '../supabaseClient'
 
-const API_BASE = '/api/admin'  // Proxied by Vite → no CORS preflight overhead
+const getBackendBase = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : 'https://efg-backend.onrender.com'
+}
+
+const API_BASE = `${getBackendBase()}/api/admin`
 
 async function authFetch(endpoint, options = {}) {
   const { data: { session } } = await supabase.auth.getSession()

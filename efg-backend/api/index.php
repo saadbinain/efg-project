@@ -40,6 +40,9 @@ switch ($resource) {
         require_once 'stats.php';
         handleStats($db, $id);
         break;
+    case 'admin':
+        require_once __DIR__ . '/admin.php';
+        break;
     default:
         http_response_code(404);
         echo json_encode(["error" => "Endpoint not found"]);

@@ -1,5 +1,12 @@
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^api/admin/ api/admin.php [QSA,L]
-RewriteRule ^api/ api/index.php [QSA,L]
+
+# Allow direct access to real files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route admin endpoints to admin.php
+RewriteRule ^api/admin(/.*)?$ api/admin.php [QSA,L]
+
+# Route all other API endpoints to index.php
+RewriteRule ^api(/.*)?$ api/index.php [QSA,L]
