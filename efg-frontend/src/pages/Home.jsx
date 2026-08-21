@@ -3,6 +3,30 @@ import { Link, useOutletContext } from 'react-router-dom'
 import { fetchCourses, fetchColleges, getLogoUrl } from '../services/api'
 import { TargetIcon, SearchIcon, DollarIcon, HandshakeIcon, BookIcon, CheckIcon, SchoolIcon } from '../components/Icons'
 
+import heroSlide1 from '../assets/hero-slides/687959306_961409399962104_5414370061654671049_n.jpg'
+import heroSlide2 from '../assets/hero-slides/753738947_1028136929956017_4571104637079190329_n.jpg'
+import heroSlide3 from '../assets/hero-slides/753874286_1028142189955491_7195494864830307377_n.jpg'
+import heroSlide4 from '../assets/hero-slides/758830821_1031876929582017_1840778349953764816_n.jpg'
+import heroSlide5 from '../assets/hero-slides/767168126_1041614448608265_1793831864174111324_n.jpg'
+import heroSlide6 from '../assets/hero-slides/774448574_1046273564809020_629135596487759412_n.jpg'
+import heroSlide7 from '../assets/hero-slides/8ef3cb39-8ac8-4998-b065-4c6b7c783693.jpg'
+import heroSlide8 from '../assets/hero-slides/9e2c2a96-06e8-4533-b2d7-572d13bc9edc.jpg'
+import heroSlide9 from '../assets/hero-slides/FullSizeRender.JPG'
+import heroSlide10 from '../assets/hero-slides/a1aa4d91-29b3-4c37-8b37-47c6d59eec46.jpg'
+
+const HERO_BG_SLIDES = [
+  heroSlide1,
+  heroSlide2,
+  heroSlide3,
+  heroSlide4,
+  heroSlide5,
+  heroSlide6,
+  heroSlide7,
+  heroSlide8,
+  heroSlide9,
+  heroSlide10,
+]
+
 const POPULAR_DEGREES = [
   {
     name: 'Education (BSEd, BEEd, BECEd)',
@@ -114,7 +138,16 @@ export default function Home() {
   const [visibleSections, setVisibleSections] = useState(new Set())
   const [activeSlide, setActiveSlide] = useState(0)
   const [isSlidePaused, setIsSlidePaused] = useState(false)
+  const [heroBgIndex, setHeroBgIndex] = useState(0)
   const { statsData } = useOutletContext()
+
+  // Auto-advance hero background slideshow every 4.5s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroBgIndex(prev => (prev + 1) % HERO_BG_SLIDES.length)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [])
 
   // Auto-advance slideshow every 3.5s (pauses on hover)
   useEffect(() => {
@@ -166,6 +199,18 @@ export default function Home() {
 
       {/* ── HERO SECTION ── */}
       <section className="efg-hero">
+        {/* Subtle Transparent Background Photo Slideshow */}
+        <div className="efg-hero-bg-slideshow">
+          {HERO_BG_SLIDES.map((slide, idx) => (
+            <div
+              key={idx}
+              className={`efg-hero-bg-slide ${idx === heroBgIndex ? 'active' : ''}`}
+              style={{ backgroundImage: `url(${slide})` }}
+            />
+          ))}
+          <div className="efg-hero-bg-overlay" />
+        </div>
+
         {/* Animated particles background */}
         <div className="efg-hero-particles">
           {[...Array(6)].map((_, i) => (
